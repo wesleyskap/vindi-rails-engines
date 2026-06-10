@@ -1,0 +1,39 @@
+<!-- Vindi PCI-Compliant Checkout Form -->
+<%= form_with url: checkout_path, local: true, data: { controller: "vindi-checkout" } do |f| %>
+  <!-- Vindi Public Key configured in environment -->
+  <input type="hidden" id="vindi-public-key" value="<%= ENV['VINDI_PUBLIC_KEY'] %>" data-vindi-checkout-target="publicKey">
+
+  <div class="form-group">
+    <label for="card_holder">Cardholder Name</label>
+    <input type="text" id="card_holder" class="form-control" data-vindi-checkout-target="holderName" placeholder="JOHN DOE" required>
+  </div>
+
+  <div class="form-group">
+    <label for="card_number">Card Number</label>
+    <input type="text" id="card_number" class="form-control" data-vindi-checkout-target="cardNumber" placeholder="4111 1111 1111 1111" required>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="card_expiry">Expiration Date</label>
+      <input type="text" id="card_expiry" class="form-control" data-vindi-checkout-target="expiry" placeholder="MM/YYYY" required>
+    </div>
+
+    <div class="form-group col-md-6">
+      <label for="card_cvv">CVV</label>
+      <input type="password" id="card_cvv" class="form-control" data-vindi-checkout-target="cvv" placeholder="123" required>
+    </div>
+  </div>
+
+  <!-- Hidden field to store the encrypted card token returned by Vindi -->
+  <%= f.hidden_field :payment_profile_token, data: { vindi_checkout_target: "tokenInput" } %>
+
+  <div class="form-group mt-3">
+    <button type="submit" class="btn btn-primary btn-block" data-action="click->vindi-checkout#tokenizeCard">
+      Pay Securely
+    </button>
+  </div>
+<% end %>
+
+<!-- Load Vindi Tokenizer JS Library -->
+<script src="https://sandbox-gp.vindi.com.br/assets/vindi.js"></script>

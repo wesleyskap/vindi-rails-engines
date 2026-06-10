@@ -22,4 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "vindi-rails", ">= 0.2.0"
   spec.add_dependency "railties", ">= 6.0"
+
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency "minitest"
 end

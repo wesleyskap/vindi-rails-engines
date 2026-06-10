@@ -10,8 +10,8 @@ module Vindi
       desc "Copies Vindi checkout Stimulus JS and view templates to your Rails application."
 
       def copy_checkout_templates
-        template "_form.html.erb", "app/views/vindi/checkout/_form.html.erb"
-        template "checkout_controller.js", "app/javascript/controllers/vindi_checkout_controller.js"
+        copy_file "_form.html.erb", "app/views/vindi/checkout/_form.html.erb"
+        copy_file "checkout_controller.js", "app/javascript/controllers/vindi_checkout_controller.js"
       end
     end
   end
