@@ -2,14 +2,16 @@
 
 ENV["RAILS_ENV"] ||= "test"
 
+require "bundler/setup"
 require "minitest/autorun"
 require "rails"
+require "action_controller/railtie"
 require "vindi"
 require "vindi/engines/engine"
 
 # Boot a minimal Rails application context for engines testing
 class DummyApp < Rails::Application
-  config.root = File.expand_path("../..", __FILE__)
+  config.root = File.expand_path("..", __FILE__)
   config.eager_load = false
   config.logger = Logger.new(nil)
   config.active_support.deprecation = :stderr

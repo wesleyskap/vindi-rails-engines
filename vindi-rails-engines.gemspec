@@ -10,14 +10,16 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Rails mountable UI Engines for Vindi checkout and payment screens."
   spec.description = "Encapsulates reusable front-end screens, checkout templates, and credit card tokenization components."
-  spec.homepage = "https://github.com/wesleyskap/vindi-rails"
+  spec.homepage = "https://github.com/wesleyskap/vindi-rails-engines"
+  spec.metadata["changelog_uri"] = "https://github.com/wesleyskap/vindi-rails-engines/blob/master/CHANGELOG.md"
+
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
 
-  spec.files = Dir["lib/**/*", "README.md", "LICENSE.txt"]
+  spec.files = Dir["lib/**/*", "app/**/*", "config/**/*", "README.md", "LICENSE.txt"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "vindi-rails", ">= 0.2.0"
