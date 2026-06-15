@@ -1,0 +1,175 @@
+<header>
+  <div class="brand">
+    <div class="logo-icon">V</div>
+    <div>
+      <h1>Vindi Integration Dashboard</h1>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">Configure and monitor your Vindi subscriptions engine</p>
+    </div>
+  </div>
+  <div>
+    <% if @connection_status == "Connected" %>
+      <span class="badge badge-success">● API Connected</span>
+    <% elsif @connection_status == "Not Configured" %>
+      <span class="badge badge-warning">● Configuration Missing</span>
+    <% else %>
+      <span class="badge badge-danger" title="<%= @connection_status %>">● API Connection Error</span>
+    <% end %>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- Config Card -->
+  <div class="card">
+    <div class="card-title">SDK Configuration</div>
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <span style="color: var(--text-muted); font-size: 0.9rem;">API Endpoint</span>
+        <span style="font-family: monospace; font-size: 0.875rem;"><%= @api_url || 'Not Set' %></span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <span style="color: var(--text-muted); font-size: 0.9rem;">API Key</span>
+        <span style="font-family: monospace; font-size: 0.875rem;">
+          <%= @api_key ? "#{@api_key[0...4]}••••••••#{@api_key[-4..-1] || ''}" : 'Not Set' %>
+        </span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Cache Store</span>
+        <span>
+          <% if @cache_enabled %>
+            <span class="badge badge-success" style="font-size: 0.75rem;">Enabled</span>
+          <% else %>
+            <span class="badge badge-warning" style="font-size: 0.75rem;">Disabled</span>
+          <% end %>
+        </span>
+      </div>
+      <% if @cache_enabled %>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+          <span style="color: var(--text-muted); font-size: 0.9rem;">Cache TTL</span>
+          <span style="font-size: 0.9rem;"><%= @cache_ttl %> seconds</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Actions Card -->
+  <div class="card">
+    <div class="card-title">Diagnostics & Tools</div>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+      Test the connectivity of your credentials to the Vindi API endpoints in real-time.
+    </p>
+    <div>
+      <button class="btn btn-primary" id="btn-test-conn" onclick="runDiagnostics()">
+        Verify Connectivity
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Plans Section -->
+<div class="card" style="margin-bottom: 2rem;">
+  <div class="card-title">
+    Vindi Active Plans
+    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">Showing last 5 plans</span>
+  </div>
+
+  <% if @plans && @plans.any? %>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 0.875rem;">
+            <th style="padding: 0.75rem 0.5rem;">ID</th>
+            <th style="padding: 0.75rem 0.5rem;">Plan Name</th>
+            <th style="padding: 0.75rem 0.5rem;">Code</th>
+            <th style="padding: 0.75rem 0.5rem;">Interval</th>
+            <th style="padding: 0.75rem 0.5rem;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @plans.each do |plan| %>
+            <tr style="border-bottom: 1px solid var(--border-color); font-size: 0.9rem;">
+              <td style="padding: 0.75rem 0.5rem; font-family: monospace;"><%= plan.id %></td>
+              <td style="padding: 0.75rem 0.5rem; font-weight: 500;"><%= plan.name %></td>
+              <td style="padding: 0.75rem 0.5rem; font-family: monospace; color: var(--text-muted);"><%= plan.code %></td>
+              <td style="padding: 0.75rem 0.5rem;"><%= plan.interval_count %> <%= plan.interval %></td>
+              <td style="padding: 0.75rem 0.5rem;">
+                <% if plan.respond_to?(:status) && plan.status == 'active' %>
+                  <span class="badge badge-success" style="font-size: 0.75rem; padding: 0.125rem 0.5rem;">Active</span>
+                <% else %>
+                  <span class="badge badge-warning" style="font-size: 0.75rem; padding: 0.125rem 0.5rem;"><%= plan.respond_to?(:status) ? plan.status : 'Active' %></span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div style="text-align: center; padding: 2rem 0; color: var(--text-muted);">
+      <% if @connection_status == "Connected" %>
+        No plans found on this merchant account.
+      <% else %>
+        Unable to load plans. Check configuration details or connection status.
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="footer">
+  Powered by <a href="https://github.com/wesleyskap/vindi-rails" target="_blank">vindi-rails-engines v<%= Vindi::Engines::VERSION %></a>
+</div>
+
+<!-- Toast Container -->
+<div id="diagnostics-toast" class="toast">
+  <span id="toast-icon" style="font-size: 1.25rem;"></span>
+  <span id="toast-message">Testing...</span>
+</div>
+
+<script>
+  function runDiagnostics() {
+    const btn = document.getElementById('btn-test-conn');
+    const toast = document.getElementById('diagnostics-toast');
+    const msg = document.getElementById('toast-message');
+    const icon = document.getElementById('toast-icon');
+
+    btn.disabled = true;
+    btn.innerText = 'Verifying...';
+
+    // Show toast loader
+    msg.innerText = 'Testing connection to Vindi API...';
+    icon.innerText = '🔄';
+    toast.style.display = 'flex';
+    toast.style.borderColor = 'var(--border-color)';
+
+    fetch('<%= test_connection_path %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        icon.innerText = '✅';
+        toast.style.borderColor = 'var(--success)';
+        msg.innerText = data.message;
+      } else {
+        icon.innerText = '❌';
+        toast.style.borderColor = 'var(--danger)';
+        msg.innerText = 'Failed: ' + data.message;
+      }
+    })
+    .catch(error => {
+      icon.innerText = '❌';
+      toast.style.borderColor = 'var(--danger)';
+      msg.innerText = 'Connection Error: ' + error.message;
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerText = 'Verify Connectivity';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
+    });
+  }
+</script>
