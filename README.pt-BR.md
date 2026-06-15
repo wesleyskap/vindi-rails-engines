@@ -23,7 +23,17 @@ Isso gera:
 - A partial de formulário de pagamento (`app/views/vindi/checkout/_form.html.erb`)
 - O controlador Stimulus JS (`app/javascript/controllers/vindi_checkout_controller.js`)
 
-### 2. Configuração de Variável de Ambiente
+### 2. Painel Administrativo (Dashboard)
+Monte o painel de controle e monitoramento diretamente no arquivo de rotas da aplicação hospedeira:
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  mount Vindi::Engine => "/admin/vindi"
+end
+```
+Isso disponibiliza um painel administrativo completo contendo o status de mapeamento das credenciais, ferramentas de teste de conectividade com a API Vindi em tempo real e listagem dos planos ativos.
+
+### 3. Configuração de Variável de Ambiente
 Configure sua chave pública no arquivo de ambiente correspondente:
 ```bash
 ENV["VINDI_PUBLIC_KEY"] = "SUA_CHAVE_PUBLICA"

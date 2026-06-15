@@ -23,7 +23,17 @@ This generates:
 - Checkout view form partial (`app/views/vindi/checkout/_form.html.erb`)
 - Stimulus controller (`app/javascript/controllers/vindi_checkout_controller.js`)
 
-### 2. Environment Setup
+### 2. Rails Engine Dashboard
+Mount the integration control panel in your host application routes:
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  mount Vindi::Engine => "/admin/vindi"
+end
+```
+This boots an administrative dashboard containing credentials mapping status, API connectivity diagnostic tools, and active Plan previews.
+
+### 3. Environment Setup
 Configure your public key in your environment file:
 ```bash
 ENV["VINDI_PUBLIC_KEY"] = "YOUR_PUBLIC_KEY"
